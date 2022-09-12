@@ -1,9 +1,29 @@
 import type { NextPage } from "next";
 import Head from "next/head";
+import { Key, useState } from "react";
+import CardProduct from "../components/cards/cardProduct";
 import Navbar from "../components/navbar";
-import { BodyPage } from "../styles/pageStyle/_Home";
+import { useFetch } from "../hooks/useFetch";
+import {
+  BodyPage,
+  ContainerContent,
+  FooterPage,
+  GridProducts,
+} from "../styles/pageStyle/_Home";
+import { DataProps } from "../types/productsTypes";
 
 const Home: NextPage = () => {
+  const [query, setQuery] = useState({
+    page: 1,
+    rows: 20,
+    sortBy: "id",
+    orderBy: "DESC",
+  });
+
+  const { data, isLoading } = useFetch<DataProps>(
+    `?page=${query.page}&rows=${query.rows}&sortBy=${query.sortBy}&orderBy=${query.orderBy}`
+  );
+
   return (
     <>
       <BodyPage>
@@ -13,6 +33,24 @@ const Home: NextPage = () => {
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <Navbar />
+        <ContainerContent>
+          <GridProducts>
+            {data?.products.map((product) => (
+              <CardProduct
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                brand={product.brand}
+                description={product.description}
+                photo={product.photo}
+                price={product.price}
+              />
+            ))}
+          </GridProducts>
+        </ContainerContent>
+        <FooterPage>
+          <p>MKS Sistemas © Todos os direitos reservados</p>
+        </FooterPage>
       </BodyPage>
     </>
   );
